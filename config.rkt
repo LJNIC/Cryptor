@@ -7,8 +7,7 @@
     (each (fn (it)
         (poke (+ 0x4040 i) it)
         (++ i)
-    ) data)
-)
+    ) data))
 
 (load-sprites '(
     ; a

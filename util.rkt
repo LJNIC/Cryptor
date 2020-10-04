@@ -11,8 +11,7 @@
 (func map (f lst)
     (if (empty? lst) 
         (empty)
-        (cons (f (car lst)) (map f (cdr lst))))
-)
+        (cons (f (car lst)) (map f (cdr lst)))))
 
 (func reduce (f val coll)
     (if (empty? coll)

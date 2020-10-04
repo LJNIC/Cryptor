@@ -17,17 +17,14 @@
         't
         units))
     
-    (and u w)
-)
+    (and u w))
 
 (func move-unit (unit vec)
     (let pos (add-vec unit vec))
-    (if (clear? pos) pos unit)
-)
+    (if (clear? pos) pos unit))
 
 (func move-units (vec)
-    (map (fn (el) (move-unit el vec)) units)
-)
+    (map (fn (el) (move-unit el vec)) units))
 
 (func menu ()
     (color 5)
@@ -40,8 +37,7 @@
     (color 5)
     (put (+ 3 (% n 9)) 6 ".")
     (++ timer)
-    (if (is (% timer 3) 0) (++ n))
-)
+    (if (is (% timer 3) 0) (++ n)))
 
 (func game ()
     ; Draw ground and walls
@@ -70,19 +66,16 @@
             (if (vec-equal unit goal) (++ count))
         ) goals)
     ) units)
-    (if (is count (len units)) (quit))
-)
+    (if (is count (len units)) (quit)))
 
-(= step (fn ()
+(func step ()
     (fill 0 0 width height " ")
     (if (is state 0) (menu)
-        (is state 1) (game))
-))
+        (is state 1) (game)))
 
-(= keydown (fn (k)
+(func keydown (k)
     (if (is state 0) (if (is k "return") (= state 1))
         (is state 1) (if (is k "up") (= units (move-units (cons 0 -1)))
                          (is k "down") (= units (move-units (cons 0 1)))
                          (is k "right") (= units (move-units (cons 1 0)))
-                         (is k "left") (= units (move-units (cons -1 0)))))
-))
+                         (is k "left") (= units (move-units (cons -1 0))))))
