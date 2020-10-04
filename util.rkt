@@ -22,3 +22,19 @@
     (if (is i 0)
         (car lst)
         (nth (- i 1) (cdr lst))))
+
+(func map-get (m index)
+    (if (empty? m) nil
+        (is (car (car m)) index) (cdr (car m))
+        (map-get (cdr m) index)))
+
+(func map-set (m index value)
+    (if (empty? m) nil
+        (is (car (car m)) index) (setcdr (car m) value)
+        (map-set (cdr m) index value)))
+
+(func map-mk-helper (lst ac)
+    (if (empty? lst) ac
+        (map-mk-helper (cdr (cdr lst)) (cons (cons (car lst) (car (cdr lst))) ac))))
+
+(func map-mk (lst) (map-mk-helper lst (empty)))

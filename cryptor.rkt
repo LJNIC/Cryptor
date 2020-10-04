@@ -2,9 +2,12 @@
 (= n 0)
 (= timer 0)
 
-(= units (list (cons 6 6) (cons 7 9)))
-(= goals (list (cons 4 4) (cons 8 8)))
-(= walls (list (cons 3 3) (cons 10 4)))
+(func create-unit (x y type)
+    (map-mk (list 'x x 'y y 'type type)))
+
+(= units (list (create-unit 6 6 'base) (create-unit 7 9 'base)))
+(= goals (list (vec-mk 4 4) (vec-mk 8 8)))
+(= walls (list (vec-mk 3 3) (vec-mk 10 4)))
 
 (func clear? (vec)
     (let w (reduce 
@@ -17,11 +20,15 @@
         't
         units))
     
-    (and u w))
+    (and u w (not (is (get (map-get vec 'x) (map-get vec 'y)) " "))))
 
 (func move-unit (unit vec)
-    (let pos (add-vec unit vec))
-    (if (clear? pos) pos unit))
+    (let pos (vec-add unit vec))
+    (if (clear? pos) 
+        (do 
+            (map-set unit 'x (map-get pos 'x))
+            (map-set unit 'y (map-get pos 'y)))
+        unit))
 
 (func move-units (vec)
     (map (fn (el) (move-unit el vec)) units))
@@ -30,8 +37,8 @@
     (color 5)
     (put 4 5 "CRYPTOR")
     (color 14)
-    (put 5 8 "Press")
-    (put 5 9 "Enter")
+    (put 5 10 "press")
+    (put 5 11 "enter")
     (color 14)
     (put 3 6 ".........")
     (color 5)
@@ -44,19 +51,19 @@
     (color 14)
     (fill 2 2 (- width 4) (- height 4) "c")
     (each (fn (wall)
-        (put (car wall) (cdr wall) "b")
+        (put (map-get wall 'x) (map-get wall 'y) "b")
     ) walls)
 
     ; Draw goals
     (color 10)
     (each (fn (goal)
-        (put (car goal) (cdr goal) "X")
+        (put (map-get goal 'x) (map-get goal 'y) "X")
     ) goals)
 
     ; Draw units
     (color 5)
     (each (fn (unit)
-        (put (car unit) (cdr unit) "X")
+        (put (map-get unit 'x) (map-get unit 'y) "X")
     ) units)
 
     ; Check goals
@@ -75,7 +82,7 @@
 
 (func keydown (k)
     (if (is state 0) (if (is k "return") (= state 1))
-        (is state 1) (if (is k "up") (= units (move-units (cons 0 -1)))
-                         (is k "down") (= units (move-units (cons 0 1)))
-                         (is k "right") (= units (move-units (cons 1 0)))
-                         (is k "left") (= units (move-units (cons -1 0))))))
+        (is state 1) (if (is k "up") (move-units (vec-mk 0 -1))
+                         (is k "down") (move-units (vec-mk 0 1))
+                         (is k "right") (move-units (vec-mk 1 0))
+                         (is k "left") (move-units (vec-mk -1 0)))))
