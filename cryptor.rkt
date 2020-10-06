@@ -73,9 +73,9 @@
 (func game ()
     ; Draw ground and walls
     (color 14)
-    (fill 2 2 (- width 4) (- height 4) "c")
+    (fill 2 2 (- width 4) (- height 4) "\"")
     (each (fn (wall)
-        (put (map-get wall 'x) (map-get wall 'y) "b")
+        (put (map-get wall 'x) (map-get wall 'y) "!")
     ) walls)
 
     ; Draw goals

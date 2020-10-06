@@ -18,22 +18,14 @@
 
 (= levels (list level-1 level-2 level-3))
 
-(func load-sprites (data)
-    (let i (* 65 7 7)) ; start from "a" offset
+(func load-sprites (index data)
+    (let i (* index 7 7)) ; start from "a" offset
     (each (fn (it)
         (poke (+ 0x4040 i) it)
         (++ i)
     ) data))
 
-(load-sprites '(
-    ; a
-    0 1 1 1 1 1 0
-    1 1 1 1 1 1 1
-    1 1 1 1 1 1 1
-    1 1 1 1 1 1 1
-    1 1 1 1 1 1 1
-    1 1 1 1 1 1 1
-    0 1 1 1 1 1 0
+(load-sprites 1 '(
     ; b
     0 1 1 1 1 1 0
     1 0 0 0 0 0 1
