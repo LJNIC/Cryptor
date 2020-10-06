@@ -28,13 +28,26 @@
     
     (and u w (not (is (get (map-get vec 'x) (map-get vec 'y)) " "))))
 
-(func move-unit (unit vec)
+(func move-base (unit vec)
     (let pos (vec-add unit vec))
     (if (clear? pos) 
-        (do 
-            (map-set unit 'x (map-get pos 'x))
-            (map-set unit 'y (map-get pos 'y)))
+        (vec-set unit (map-get pos 'x) (map-get pos 'y))
         unit))
+
+(func move-rook (unit vec)
+    (let pos (vec-add unit vec))
+    (let count 0)
+    (while (clear? pos)
+        (do 
+            (= pos (vec-add pos vec))
+            (++ count)))
+
+    (= pos (vec-add (vec-mul vec count) unit))
+    (vec-set unit (map-get pos 'x) (map-get pos 'y)))
+
+(func move-unit (unit vec)
+    (if (is 'base (map-get unit 'type)) (move-base unit vec)
+        (is 'rook (map-get unit 'type)) (move-rook unit vec)))
 
 (func move-units (vec)
     (map (fn (el) (move-unit el vec)) units))
@@ -91,7 +104,10 @@
     (each (fn (unit)
         (color 5)
         (each (fn (goal) (if (vec-equal unit goal) (color 1))) goals)
-        (put (map-get unit 'x) (map-get unit 'y) "X")
+        (put 
+            (map-get unit 'x) 
+            (map-get unit 'y) 
+            (if (is (map-get unit 'type) 'base) "X" "#"))
     ) units))
 
 
