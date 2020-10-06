@@ -3,6 +3,8 @@
 (macro when (x . body) (list 'if x (cons 'do body)))
 (macro ++ (x n) (list '= x (list '+ x (or n 1))))
 (macro -- (x n) (list '= x (list '- x (or n 1))))
+(func > (a b) (not (<= a b)))
+(func >= (a b) (not (< a b)))
 (func each (f lst) (while lst (f (car lst)) (= lst (cdr lst))))
 (func len (lst) (let n 0) (while lst (= lst (cdr lst)) (++ n)) n)
 (func empty? (lst) (not (car lst)))
@@ -18,10 +20,10 @@
         val
         (reduce f (f val (car coll)) (cdr coll))))
 
-(func nth (i lst)
+(func nth (lst i)
     (if (is i 0)
         (car lst)
-        (nth (- i 1) (cdr lst))))
+        (nth (cdr lst) (- i 1))))
 
 (func map-get (m index)
     (if (empty? m) nil

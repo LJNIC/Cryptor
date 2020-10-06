@@ -1,0 +1,1 @@
+./build.sh && chmod +x Cryptor && ./Cryptor
