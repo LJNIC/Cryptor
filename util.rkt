@@ -40,3 +40,8 @@
         (map-mk-helper (cdr (cdr lst)) (cons (cons (car lst) (car (cdr lst))) ac))))
 
 (func map-mk (lst) (map-mk-helper lst (empty)))
+
+(func map-cpy (m ac)
+    (if (empty? m) ac
+        (map-cpy (cdr m) (cons (cons (car (car m)) (cdr (car m))) ac))))
+

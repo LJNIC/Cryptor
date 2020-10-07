@@ -9,7 +9,12 @@
 (func load-level ()
     (= turns 0)
     (let l (nth levels (- level 1)))
-    (= units (map-get l 'units))
+    (= units '())
+
+    (each (fn (unit)
+        (= units (cons (map-cpy unit (empty)) units))
+    ) (map-get l 'units))
+
     (= goals (map-get l 'goals))
     (= walls (map-get l 'walls)))
 
@@ -25,8 +30,13 @@
         (fn (val it) (if (vec-equal it vec) nil val))
         't
         units))
+
+    (let x (map-get vec 'x))
+    (let y (map-get vec 'y))
+    (let in 
+        (and (> x 1) (< x 13) (> y 1) (< y 13)))
     
-    (and u w (not (is (get (map-get vec 'x) (map-get vec 'y)) " "))))
+    (and u w in))
 
 (func move-base (unit vec)
     (let pos (vec-add unit vec))
@@ -87,27 +97,32 @@
     ; Draw ground and walls
     (color 14)
     (fill 2 2 (- width 4) (- height 4) "\"")
+    (color 15)
     (each (fn (wall)
         (put (map-get wall 'x) (map-get wall 'y) "!")
     ) walls)
 
+    (color 14)
+    (put 10 1 "R$%")
+
     ; Draw goals
-    (color 10)
     (each (fn (goal)
-        (put (map-get goal 'x) (map-get goal 'y) "X")
+        (let type (map-get goal 'type))
+        (put (map-get goal 'x) (map-get goal 'y) (if (is 'base type) "X" "#"))
     ) goals)
 
     (color 5)
-    (put 3 1 turns)
+    (put 2 1 turns)
 
     ; Draw units
     (each (fn (unit)
-        (color 5)
+        (let type (map-get unit 'type))
+        (if (is 'base type) (color 5) (color 2))
         (each (fn (goal) (if (vec-equal unit goal) (color 1))) goals)
         (put 
             (map-get unit 'x) 
             (map-get unit 'y) 
-            (if (is (map-get unit 'type) 'base) "X" "#"))
+            (if (is 'base type) "X" "#"))
     ) units))
 
 
@@ -125,7 +140,8 @@
     (let count 0)
     (each (fn (unit)
         (each (fn (goal)
-            (if (vec-equal unit goal) (++ count))
+            (if (and (vec-equal unit goal) (is (map-get unit 'type) (map-get goal 'type)))
+                (++ count))
         ) goals)
     ) units)
 
@@ -143,4 +159,5 @@
         (is state 'game) (if (is k "up") (turn (vec-mk 0 -1))
                             (is k "down") (turn (vec-mk 0 1))
                             (is k "right") (turn (vec-mk 1 0))
-                            (is k "left") (turn (vec-mk -1 0)))))
+                            (is k "left") (turn (vec-mk -1 0))
+                            (is k "r") (load-level))))
