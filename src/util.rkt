@@ -5,7 +5,10 @@
 (macro -- (x n) (list '= x (list '- x (or n 1))))
 (func > (a b) (not (<= a b)))
 (func >= (a b) (not (< a b)))
-(func each (f lst) (while lst (f (car lst)) (= lst (cdr lst))))
+(func each (f lst) 
+    (while lst 
+        (f (car lst)) 
+        (= lst (cdr lst))))
 (func len (lst) (let n 0) (while lst (= lst (cdr lst)) (++ n)) n)
 (func empty? (lst) (not (car lst)))
 (func empty () (list))

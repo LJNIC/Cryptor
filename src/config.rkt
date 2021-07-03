@@ -19,6 +19,10 @@
     'units (list (create-unit 3 7 'rook))
     'goals (list (create-unit 5 10 'rook))
     'walls (list (vec-mk 11 7) (vec-mk 10 3) (vec-mk 4 4) (vec-mk 5 11)))))
+(= level-5 (map-mk (list
+    'units (list (create-unit 3 7 'rook))
+    'goals (list (create-unit 9 10 'rook))
+    'walls (list))))
 
 (= levels (list level-1 level-2 level-3 level-4))
 

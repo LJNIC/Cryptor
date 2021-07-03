@@ -1,6 +1,7 @@
 (= state 'menu)
 (= level 1)
 (= turns 0)
+(= scores '())
 
 (= units '())
 (= goals '())
@@ -91,7 +92,34 @@
     (if (is (% blink-timer 5) 0) (++ n))
 
     (++ trans-timer)
-    (if (>= trans-timer 45) (= state 'game)))
+    (when (>= trans-timer 45) 
+        (load-level)
+        (= state 'game)))
+
+(= win-timer 0)
+(= win-blink 0)
+(func win ()
+    (game)
+    (++ win-timer)
+    (when (is (% win-timer 5) 0) (= win-blink 2))
+
+    (when (> win-blink 0)
+        (-- win-blink)
+        (color 14)
+        (each (fn (goal)
+            (put (map-get goal 'x) (map-get goal 'y) (if (is (map-get goal 'type) 'base) "X" "#"))
+        ) goals))
+
+    (when (> win-timer 20)
+        (++ level)
+        (if (> level (len levels))
+            (each (fn (s)
+              (print s)
+            ) scores))
+        (= n 0)
+        (= trans-timer 0)
+        (= blink-timer 0)
+        (= state 'trans)))
 
 (func game ()
     ; Draw ground and walls
@@ -125,8 +153,10 @@
             (if (is 'base type) "X" "#"))
     ) units))
 
+(func report ()
+    )
 
-(= states (map-mk (list 'menu menu 'game game 'trans trans)))
+(= states (map-mk (list 'menu menu 'game game 'trans trans 'win win 'report report)))
 
 (func step ()
     (fill 0 0 width height " ")
@@ -145,18 +175,16 @@
         ) goals)
     ) units)
 
-    (when (is count (len units)) 
-        (++ level)
-        (if (> level (len levels)) (quit))
-        (load-level)
-        (= n 0)
-        (= trans-timer 0)
-        (= blink-timer 0)
-        (= state 'trans)))
+    (when (is count (len units))
+        (= scores (cons turns scores))
+        (= win-timer 0)
+        (= win-blink 0)
+        (= state 'win)))
 
 (func keydown (k)
     (if (is state 'menu) (if (is k "return") (= state 'trans))
-        (is state 'game) (if (is k "up") (turn (vec-mk 0 -1))
+        (is state 'game) (if 
+                            (is k "up") (turn (vec-mk 0 -1))
                             (is k "down") (turn (vec-mk 0 1))
                             (is k "right") (turn (vec-mk 1 0))
                             (is k "left") (turn (vec-mk -1 0))
