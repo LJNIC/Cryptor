@@ -1,17 +1,25 @@
 (= macro (mac (sym params . body) (list '= sym (cons 'mac (cons params body)))))
+
 (macro func (sym params . body) (list '= sym (cons 'fn (cons params body))))
+
 (macro when (x . body) (list 'if x (cons 'do body)))
+
 (macro ++ (x n) (list '= x (list '+ x (or n 1))))
 (macro -- (x n) (list '= x (list '- x (or n 1))))
 (func > (a b) (not (<= a b)))
 (func >= (a b) (not (< a b)))
+(func abs (x) 
+    (if (< x 0) (* -1 x) x))
+
 (func each (f lst) 
     (while lst 
         (f (car lst)) 
         (= lst (cdr lst))))
+
 (func len (lst) (let n 0) (while lst (= lst (cdr lst)) (++ n)) n)
 (func empty? (lst) (not (car lst)))
 (func empty () (list))
+(func void () nil)
 
 (func map (f lst)
     (if (empty? lst) 
@@ -28,23 +36,28 @@
         (car lst)
         (nth (cdr lst) (- i 1))))
 
-(func map-get (m index)
+(func append (lst-a lst-b)
+    (if (empty? lst-a)
+        lst-b
+        (cons (car lst-a) (append (cdr lst-a) lst-b))))
+
+(func get (m index)
     (if (empty? m) nil
         (is (car (car m)) index) (cdr (car m))
-        (map-get (cdr m) index)))
+        (get (cdr m) index)))
 
-(func map-set (m index value)
+(func set (m index value)
     (if (empty? m) nil
         (is (car (car m)) index) (setcdr (car m) value)
-        (map-set (cdr m) index value)))
+        (set (cdr m) index value)))
 
 (func map-mk-helper (lst ac)
     (if (empty? lst) ac
         (map-mk-helper (cdr (cdr lst)) (cons (cons (car lst) (car (cdr lst))) ac))))
 
-(func map-mk (lst) (map-mk-helper lst (empty)))
+(func table (lst) (map-mk-helper lst (empty)))
 
-(func map-cpy (m ac)
+(func copy (m ac)
     (if (empty? m) ac
-        (map-cpy (cdr m) (cons (cons (car (car m)) (cdr (car m))) ac))))
+        (copy (cdr m) (cons (cons (car (car m)) (cdr (car m))) ac))))
 
