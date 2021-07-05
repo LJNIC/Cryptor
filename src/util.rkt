@@ -55,7 +55,7 @@
     (if (empty? lst) ac
         (map-mk-helper (cdr (cdr lst)) (cons (cons (car lst) (car (cdr lst))) ac))))
 
-(func table (lst) (map-mk-helper lst (empty)))
+(func table (first . rest) (map-mk-helper (cons first rest) (empty)))
 
 (func copy (m ac)
     (if (empty? m) ac

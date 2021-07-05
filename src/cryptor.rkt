@@ -25,11 +25,11 @@
 ; Load the first level
 (load-level)
 
-; ============================
-;         GAME STATES 
-; ============================
+; ================================================================
+;                          GAME STATES 
+; ================================================================
 
-; Chec; Menu state function
+; Menu state function
 (= n 0)
 (= menu-timer 0)
 (func menu ()
@@ -107,6 +107,7 @@
 
 ; Normal game state function
 (func game-enter ()
+    (= accept-arrow turn)
     (= has-won-already? nil))
 (func game ()
     ; Draw ground and walls
@@ -137,7 +138,12 @@
         (when (is type 'rook)
             (color 2)
             (update-rook unit))
-        (each (fn (goal) (if (vec-equal unit goal) (color 1))) goals)
+
+        (each (fn (goal) 
+            (when (and (is (get unit 'type) (get goal 'type)) (vec-equal unit goal))
+                (color 1))
+        ) goals)
+
         (put 
             (get unit 'x) 
             (get unit 'y) 
@@ -152,8 +158,20 @@
 (func report ()
     )
 
-(= states (table (list 'menu menu 'game game 'trans trans 'win win 'report report)))
-(= state-transitions (table (list 'menu void 'game game-enter 'trans trans-enter 'win win-enter 'report void)))
+(= editor-pos (vec 5 5))
+(= editor-tile 'wall)
+(= editor-tiles (table 'wall "!"))
+(func editor-enter ()
+    (= accept-arrow (fn (dir) (= editor-pos (vec-add editor-pos dir)))))
+(func editor ()
+    (game)
+    (color 1)
+    (put (get editor-pos 'x) (get editor-pos 'y) (get editor-tiles editor-tile)))
+
+(= states (table
+    'menu menu 'game game 'trans trans 'win win 'report report 'editor editor
+    ))
+(= state-transitions (table 'menu void 'game game-enter 'trans trans-enter 'win win-enter 'report void 'editor editor-enter))
 (func state-trans (next-state) 
       ((get state-transitions next-state))
       (= state next-state))
@@ -163,55 +181,55 @@
     (fill 0 0 width height " ")
     ((get states state)))
 
-; ================
-;    TURN LOGIC
-; ================
+; ================================================================
+;                           TURN LOGIC
+; ================================================================
 
 ; checks if a position is clear of any walls or units
-(func clear? (vec)
+(func clear? (pos)
     (let wall-exists (reduce 
-        (fn (val it) (if (vec-equal it vec) nil val))
+        (fn (val it) (if (vec-equal it pos) nil val))
         't
         walls))
 
     (let unit-exists (reduce 
-        (fn (val it) (if (vec-equal it vec) nil val))
+        (fn (val it) (if (vec-equal it pos) nil val))
         't
         units))
 
-    (let x (get vec 'x))
-    (let y (get vec 'y))
+    (let x (get pos 'x))
+    (let y (get pos 'y))
     (let inside-grid (and (> x 1) (< x 13) (> y 1) (< y 13)))
     
     (and wall-exists unit-exists inside-grid))
 
 ; Moves the basic unit (one tile at a time)
-(func move-base (unit vec)
-    (let pos (vec-add unit vec))
+(func move-base (unit dir)
+    (let pos (vec-add unit dir))
     (if (clear? pos) 
         (vec-set unit (get pos 'x) (get pos 'y))
         unit))
 
 ; Moves the rook unit (like a rook in chess)
-(func move-rook (unit vec)
-    (let pos (vec-add unit vec))
+(func move-rook (unit dir)
+    (let pos (vec-add unit dir))
     (let count 0)
     (while (clear? pos)
         (do 
-            (= pos (vec-add pos vec))
+            (= pos (vec-add pos dir))
             (++ count)))
 
-    (= pos (vec-add (vec-mul vec count) unit))
+    (= pos (vec-add (vec-mul dir count) unit))
     (set unit 'future-pos pos))
 
 ; Utility for moving any unit type
-(func move-unit (unit vec)
-    (if (is 'base (get unit 'type)) (move-base unit vec)
-        (is 'rook (get unit 'type)) (move-rook unit vec)))
+(func move-unit (unit dir)
+    (if (is 'base (get unit 'type)) (move-base unit dir)
+        (is 'rook (get unit 'type)) (move-rook unit dir)))
 
 ; Moves all units in the direction
-(func move-units (vec)
-    (map (fn (el) (move-unit el vec)) units))
+(func move-units (dir)
+    (map (fn (el) (move-unit el dir)) units))
 
 ; Checks if all rook movements are complete
 (func animations-done? ()
@@ -225,17 +243,21 @@
         units))
 
 ; Executes a turn in the game given a direction
-(func turn (vec)
+(func turn (dir)
     (when (animations-done?) 
-        (move-units vec)
+        (move-units dir)
         (++ turns)))
 
 ; INPUT HANDLER
 (func keydown (k)
-    (if (is state 'menu) (if (is k "return") (state-trans 'trans))
-        (is state 'game) (if 
-                            (is k "up") (turn (vec-mk 0 -1))
-                            (is k "down") (turn (vec-mk 0 1))
-                            (is k "right") (turn (vec-mk 1 0))
-                            (is k "left") (turn (vec-mk -1 0))
-                            (is k "r") (load-level))))
+    (if (and (is state 'menu) (is k "return")) 
+        (state-trans 'trans))
+        (or (is state 'game) (is state 'editor)) 
+        (if 
+            (is k "up") (accept-arrow (vec 0 -1))
+            (is k "down") (accept-arrow (vec 0 1))
+            (is k "right") (accept-arrow (vec 1 0))
+            (is k "left") (accept-arrow (vec -1 0))
+            (is k "r") (load-level)
+            (is k "n") (do (++ level) (load-level))
+            (is k "e") (state-trans 'editor)))

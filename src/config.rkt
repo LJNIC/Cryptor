@@ -2,31 +2,40 @@
 (= width 15)
 (= height 15)
 
-(func create-unit (x y type extra)
-    (table (append (list 'x x 'y y 'type type) extra)))
+(func create-unit (x y type . extra)
+    (table 'x x 'y y 'type type extra))
 (func create-rook (x y)
-    (create-unit x y 'rook (list 'future-pos (vec-mk x y))))
+    (create-unit x y 'rook 'future-pos (vec x y)))
 
-(= level-1 (table (list
+(= level-1 (table 
     'units (list (create-unit 3 7 'base))
-    'goals (list (create-unit 7 7 'base)))))
-(= level-2 (table (list
+    'goals (list (create-unit 7 7 'base))))
+(= level-2 (table 
     'units (list (create-unit 3 9 'base) (create-unit 3 5 'base))
-    'goals (list (create-unit 7 9 'base) (create-unit 7 5 'base)))))
-(= level-3 (table (list
+    'goals (list (create-unit 7 9 'base) (create-unit 7 5 'base))))
+(= level-3 (table 
     'units (list (create-unit 3 8 'base) (create-unit 5 5 'base))
     'goals (list (create-unit 9 8 'base) (create-unit 9 5 'base))
-    'walls (list (vec-mk 7 4) (vec-mk 7 5) (vec-mk 7 6)))))
-(= level-4 (table (list
+    'walls (list (vec 7 4) (vec 7 5) (vec 7 6))))
+(= level-4 (table 
     'units (list (create-rook 3 7))
-    'goals (list (create-rook 5 10))
-    'walls (list (vec-mk 11 7) (vec-mk 10 3) (vec-mk 4 4) (vec-mk 5 11)))))
-(= level-5 (table (list
-    'units (list (create-rook 3 7))
-    'goals (list (create-rook 9 10))
-    'walls (list))))
+    'goals (list (create-rook 5 10))))
+    ;'walls (list (vec 11 7) (vec 10 3) (vec 4 4) (vec 5 11))))
+(= level-5 (table 
+    'units (list (create-rook 3 7) (create-unit 5 5 'base))
+    'goals (list (create-rook 2 3) (create-unit 10 8 'base))
+    'walls (list (vec 3 3) (vec 6 7) (vec 10 4) (vec 10 9))))
+(= level-6 (table
+    'units (list (create-rook 3 7) (create-rook 5 5))
+    'goals (list (create-rook 9 10) (create-rook 4 7))
+    'walls (list (vec 3 3) (vec 6 7) (vec 10 4) (vec 10 9))))
+(= level-7 (table
+    'units (list (create-rook 3 7) (create-rook 5 5))
+    'goals (list (create-rook 9 10) (create-rook 4 7))
+    'walls (list (vec 3 3) (vec 6 7) (vec 10 4) (vec 10 9))))
+(print level-4)
 
-(= levels (list level-1 level-2 level-3 level-4))
+(= levels (list level-1 level-2 level-3 level-4 level-5 level-6 level-7))
 
 (func load-sprites (index data)
     (let i (* index 7 7)) ; start from "a" offset
