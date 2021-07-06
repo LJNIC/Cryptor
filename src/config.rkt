@@ -5,7 +5,7 @@
 (func create-unit (x y type . extra)
     (table 'x x 'y y 'type type extra))
 (func create-rook (x y)
-    (create-unit x y 'rook 'future-pos (vec x y)))
+    (table 'x x 'y y 'type 'rook 'future-pos (vec x y)))
 
 (= level-1 (table 
     'units (list (create-unit 3 7 'base))
@@ -18,9 +18,9 @@
     'goals (list (create-unit 9 8 'base) (create-unit 9 5 'base))
     'walls (list (vec 7 4) (vec 7 5) (vec 7 6))))
 (= level-4 (table 
-    'units (list (create-rook 3 7))
-    'goals (list (create-rook 5 10))))
-    ;'walls (list (vec 11 7) (vec 10 3) (vec 4 4) (vec 5 11))))
+    'units (list (create-rook 3 7) (create-rook 4 2) (create-rook 5 5) (create-rook 7 5))
+    'goals (list (create-rook 5 10))
+    'walls (list (vec 11 7) (vec 10 3) (vec 4 4) (vec 5 11))))
 (= level-5 (table 
     'units (list (create-rook 3 7) (create-unit 5 5 'base))
     'goals (list (create-rook 2 3) (create-unit 10 8 'base))

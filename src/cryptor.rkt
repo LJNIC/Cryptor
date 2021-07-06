@@ -187,6 +187,7 @@
 
 ; checks if a position is clear of any walls or units
 (func clear? (pos)
+    (print "enter")
     (let wall-exists (reduce 
         (fn (val it) (if (vec-equal it pos) nil val))
         't
@@ -200,6 +201,7 @@
     (let x (get pos 'x))
     (let y (get pos 'y))
     (let inside-grid (and (> x 1) (< x 13) (> y 1) (< y 13)))
+    (print "exit")
     
     (and wall-exists unit-exists inside-grid))
 
